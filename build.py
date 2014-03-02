@@ -1,4 +1,6 @@
 #!/usr/bin/env python2
+# GRESHUNKEL SITE GENERATOR
+# It'll put your pants on.
 from os import listdir
 import re, argparse
 
@@ -116,7 +118,15 @@ def _render_file(file_yo):
         for base_file in file_yo["children"]:
             _render_file(base_file)
     else:
-        output = open(BUILD_DIR + file_yo["filename"], "w+")
+        output = None
+        if file_yo["filename"] == "documentation.html":
+            raw_version = [x for x in context["DEFINE"] if x['name'] == 'VERSION'][0]['raw_code']
+            version_num = raw_version.split(" ")[2].strip().replace('"', '')
+            file_loc = "{}{}/en/{}".format(BUILD_DIR,
+                    version_num, file_yo["filename"])
+            output = open(file_loc)
+        else:
+            output = open(BUILD_DIR + file_yo["filename"], "w+")
         parent_file = None
 
         if file_yo['vars'].get("PARENT"):
@@ -132,13 +142,13 @@ def _render_file(file_yo):
                         to_write = _interpolate(line, file_yo)
                     else:
                         # ChIlD BloCk oR SoMeThIng, Yo
-                        beginning = line.strip().split("xXx")[0]
-                        end = line.strip().split("xXx")[2]
-                        block_name = line.strip().split("xXx")[1].strip()
+                        beginning = line.split("xXx")[0]
+                        end = line.split("xXx")[2]
+                        block_name = line.split("xXx")[1].strip()
                         block_data = file_yo['blocks'].get(block_name, "")
                         to_write = beginning + block_data + end
 
-                output.write(to_write.strip() if "core" not in to_write else to_write)
+                output.write(to_write if "core" not in to_write else to_write)
         else:
             for line in in_file:
                 to_write = line
@@ -282,12 +292,12 @@ def main():
                     loop_stack = None
             elif "xXx" in stripped and reading_block is False:
                 reading_block = True
-                lstripped = stripped.split("xXx")
+                lstripped = line.split("xXx")
                 block_name = lstripped[1].strip()
                 block_str = lstripped[0]
                 end_str = lstripped[2]
             if active_loops == 0 and reading_block is True and "xXx" not in stripped:
-                block_str = block_str + stripped
+                block_str = block_str + line
             if active_loops > 0:
                 def recurse_bro(item):
                     if item is not None:

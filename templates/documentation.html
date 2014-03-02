@@ -9,15 +9,18 @@ xXx CONTENT xXx
     <div class="grid grid-pad">
         <div class="col-1-1">
             <div class="content">
-                <h1>Overview</h1>
+                <h2>Overview</h2>
                 <ul>
                     <li>
                         <a href="#overview">General Overview</a>
                         <ul>
+                            <li><a href="#building">Building</a></li>
                             <li><a href="#getting_started">Getting Started</a></li>
-                            <li><a href="#technical_overview">Technical Overview</a></li>
                         </ul>
                     </li>
+                </ul>
+                <h2>API Documentation</h2>
+                <ul>
                     <li>
                         <a href="#macros">Macros</a>
                         <ul>
@@ -41,8 +44,7 @@ xXx CONTENT xXx
                             <li><a href="#xXx struct$name xXx">xXx struct$name xXx</a></li>
                         xXx BBL xXx
                         </ul>
-                    </li>
-                    <li>
+                    </li> <li>
                         <a href="#functions">Functions</a>
                         <ul>
                         xXx LOOP func FUNCTION xXx
@@ -54,6 +56,17 @@ xXx CONTENT xXx
                 <div class="doc_chunk">
                     <h2 id="overview">General Overview</h2>
                     <p>OlegDB is a concurrent, pretty fast K/V hash-table with an Erlang frontend. It uses the <a href=\"https://en.wikipedia.org/wiki/MurmurHash\">Murmur3</a> hashing algorithm to hash and index keys. We chose Erlang for the server because it's functional, uses the actor model and the pattern matching is ridiculous.</p>
+                    <p>Persistence is accomplished using an Append-only log file, in addition to regularly snapshotting the entire database and writing it to disk.</p>
+                    <h3 id="building">Building</h3>
+                    <p>OlegDB is usually built and tested with the latest stable version of GCC, but we've had success with both older version of gcc and Clang 3.3/3.5.<p>
+                    <p>Compiling is as simple as <a href="downloads.html">downloading</a> the release you want, untarring it (You have tar, right?) and typing make inside the unzipped directory.</p>
+                    <p>Oh, you'll probably also need Erlang. Maybe.</p>
+                    <pre>
+                        <code>$ tar -xvf olegdb.tar.gz
+$ make</code>
+                    </pre>
+                    <p>If you don't things to be installed in <code>/usr/local</code>, you can specify a prefix when you install:</p>
+                    <pre><code>make install PREFIX=/usr</code></pre>
                     <h3 id="getting_started">Getting Started</h3>
                     <p>Running OlegDB using the builtin Erlang interfaces allows you to manipulate data using your standard REST interface commands, GET, POST, DELETE, etc.</p>
                     <p>For example, to store the value <span>Raphael</span> into the named database <span>turtles</span> under the key <span>red</span> you could use something like the following:</p>
@@ -68,10 +81,6 @@ xXx CONTENT xXx
                     <pre>
                         <code>$ curl -X POST  --header "Content-Type:text/html" -d '&lt;p&gt;Raphael&lt;/p&gt;' http://localhost:8080/turtles/test</code>
                     </pre>
-
-                    <h3 id="technical_overview">Technical Overview</h3>
-                    <p>At it's heart, OlegDB is just a hash table. Hashes are generated with murmur3 and stored in a single large chunk of memory. Collisions are dealt with using <a href="http://en.wikipedia.org/wiki/Hash_table#Separate_chaining_with_linked_lists">linked lists</a>. The table is regrown when it reaches maximum capacity.</p>
-                    <p>Keys are hard truncated to the value of <a href="#KEY_SIZE"><code>KEY_SIZE</code></a>. This happens transparently.</p>
                 </div>
                 <div class="doc_chunk">
                     <h2 id="macros">Macros</h2>
